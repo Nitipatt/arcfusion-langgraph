@@ -226,8 +226,8 @@ class SemanticCache:
                 # Upsert: if same hash exists, update it
                 conn.execute(
                     text(
-                        "INSERT INTO query_cache (query, normalized_query, query_hash, db_url_hash, result) "
-                        "VALUES (:q, :nq, :h, :dh, CAST(:r AS jsonb)) "
+                        "INSERT INTO query_cache (query, normalized_query, query_hash, db_url_hash, result, hit_count) "
+                        "VALUES (:q, :nq, :h, :dh, CAST(:r AS jsonb), 0) "
                         "ON CONFLICT (query_hash) DO UPDATE SET "
                         "  result = EXCLUDED.result, "
                         "  created_at = now(), "
