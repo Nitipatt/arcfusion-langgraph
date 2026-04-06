@@ -1,60 +1,32 @@
-name: Deploy LangGraph to VPS
-
+name: Deploy LangGraph Service
 on:
-  workflow_run:
-    workflows: ["LangGraph CI"]
-    types:
-      - completed
-    branches: [main]
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy Repository to VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          source: "."
+          target: "/opt/arcfusion/langgraph-service"
+          rm: true
+
+      - name: Trigger Remote Docker Restart
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
-            set -e
-
-            APP_DIR="/opt/arcfusion-langgraph"
-            
-            mkdir -p "$APP_DIR"
-            cd "$APP_DIR"
-            git config --global --add safe.directory "$APP_DIR"
-            
-            if [ ! -d ".git" ]; then
-              git init
-              git remote add origin https://x-access-token:${{ secrets.GIT_TOKEN }}@github.com/${{ github.repository }}.git
-            fi
-            
-            git fetch origin main
-            git reset --hard origin/main
-
-            # Env check
-            if [ ! -f ".env" ]; then
-                echo "Warning: .env is missing. Make sure to create it on the VPS."
-            fi
-
-            docker build -t arcfusion-langgraph .
-
-            docker stop arcfusion-langgraph 2>/dev/null || true
-            docker rm arcfusion-langgraph 2>/dev/null || true
-
-            docker network create arcfusion-net 2>/dev/null || true
-
-            docker run -d \
-              --name langgraph \
-              --network arcfusion-net \
-              --restart unless-stopped \
-              -p 9002:8001 \
-              --env-file .env \
-              arcfusion-langgraph
-
-            docker image prune -f
-            echo "LangGraph Deployment completed!"
+            cd /opt/arcfusion
+            docker compose up -d --build langgraph
