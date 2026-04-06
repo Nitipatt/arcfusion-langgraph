@@ -29,4 +29,5 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd /opt/arcfusion
+            cp secrets/langgraph.env langgraph-service/.env
             docker compose up -d --build langgraph
