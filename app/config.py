@@ -24,9 +24,9 @@ class Settings(BaseSettings):
     DB_SSLMODE: str = "disable"
 
     # Service
-    SERVICE_PORT: int = 8001
+    SERVICE_PORT: int = 9002
     DEBUG: bool = False
-    ALLOWED_ORIGINS: str = "http://localhost:8000"
+    ALLOWED_ORIGINS: str = "http://localhost:9001"
 
     # Cache Configuration
     CACHE_ENABLED: bool = True
