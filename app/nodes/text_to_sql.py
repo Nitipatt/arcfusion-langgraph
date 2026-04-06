@@ -2,7 +2,6 @@
 
 import re
 from langchain_core.messages import HumanMessage
-from ..config import settings
 from ..llm import get_llm
 from ..state import AgentState
 from ..prompts import TEXT_TO_SQL_PROMPT, TEXT_TO_SQL_RETRY_CONTEXT

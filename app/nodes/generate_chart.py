@@ -4,7 +4,6 @@ import json
 from typing import Any
 from pydantic import BaseModel, Field
 from langchain_core.messages import HumanMessage
-from ..config import settings
 from ..llm import get_llm
 from ..state import AgentState
 from ..prompts import CHART_PROMPT
