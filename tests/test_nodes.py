@@ -1,6 +1,5 @@
 """Tests for the LangGraph service nodes and graph structure."""
 
-import pytest
 from unittest.mock import patch, MagicMock
 from app.state import AgentState
 from app.nodes.text_to_sql import text_to_sql
