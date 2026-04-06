@@ -18,8 +18,8 @@ import threading
 from typing import Any
 
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer  # type: ignore[import-untyped]
+from sklearn.metrics.pairwise import cosine_similarity  # type: ignore[import-untyped]
 from sqlalchemy import create_engine, text
 
 logger = logging.getLogger(__name__)
@@ -102,7 +102,7 @@ class SemanticCache:
     def _enforce_max_size(self) -> None:
         """Evict oldest entries if cache exceeds max_size."""
         with self._engine.connect() as conn:
-            count = conn.execute(text("SELECT count(*) FROM query_cache")).scalar()
+            count = int(conn.execute(text("SELECT count(*) FROM query_cache")).scalar() or 0)
             if count >= self.max_size:
                 to_delete = count - self.max_size + 1
                 conn.execute(

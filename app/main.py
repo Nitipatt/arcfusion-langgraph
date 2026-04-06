@@ -49,7 +49,7 @@ class DbConnectionInfo(BaseModel):
     database: str = ""
     user: str = "postgres"
     password: str = ""
-    schema: str = "public"
+    db_schema: str = Field(default="public", alias="schema")
     sslmode: str = "disable"
 
     @property
@@ -57,7 +57,7 @@ class DbConnectionInfo(BaseModel):
         return (
             f"postgresql://{self.user}:{self.password}"
             f"@{self.host}:{self.port}/{self.database}"
-            f"?options=-csearch_path%3D{self.schema}&sslmode={self.sslmode}"
+            f"?options=-csearch_path%3D{self.db_schema}&sslmode={self.sslmode}"
         )
 
 

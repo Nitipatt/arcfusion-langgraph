@@ -169,7 +169,7 @@ def _fallback_chart(raw_data: list[dict], query: str, chart_type: str = "bar") -
         # Try to group by a second dimension
         if len(keys) >= 3:
             group_key = keys[1] if keys[1] != y_key else keys[0]
-            groups = {}
+            groups: dict[str, dict[str, Any]] = {}
             for row in raw_data[:50]:
                 g = str(row.get(group_key, ""))
                 if g not in groups:

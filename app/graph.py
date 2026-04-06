@@ -10,6 +10,7 @@ Graph topology:
 """
 
 from langgraph.graph import StateGraph, END
+from typing import Any
 from .state import AgentState
 from .nodes.schema_extractor import schema_extractor
 from .nodes.guardrail import query_guardrail
@@ -53,7 +54,7 @@ def mark_error(state: AgentState) -> dict:
     return {"status": "error"}
 
 
-def build_graph() -> StateGraph:
+def build_graph() -> Any:
     """Build and compile the analytics agent graph."""
     graph = StateGraph(AgentState)
 
