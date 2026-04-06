@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Literal
 
 
@@ -51,9 +51,7 @@ class Settings(BaseSettings):
             return "claude-sonnet-4-20250514"
         return "gpt-4o"
 
-    class Config:
-        env_file = ".env"
-        extra = "allow"
+    model_config = SettingsConfigDict(env_file=".env", extra="allow")
 
 
 settings = Settings()
