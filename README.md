@@ -20,7 +20,22 @@ The LangGraph Service is fundamentally designed to be a computationally intensiv
    - `schema_extractor.py`: Fetches the layout of tables/columns securely.
    - `generate_insights.py`: Formats findings into narrative and title.
    - Other nodes execute SQL natively and validate context limits.
-4. **State Management (`app/state.py`)**: Defines the typed contract mapping the agent's memory as it transverses graph nodes. Re-attempts and history persistence are defined here before yielding final output back to the primary API.
+4. **State Management (`src/store`)**: Defines the typed contract mapping the agent's memory as it transverses graph nodes. Re-attempts and history persistence are defined here before yielding final output back to the primary API.
+
+### Semantic Caching Strategy
+
+To drastically reduce LLM API costs (OpenAI/Anthropic) and improve response latencies, the LangGraph service implements a sophisticated **PostgreSQL-backed Semantic Cache**. Instead of treating every natural language query as unique, the cache vectorizes user intents.
+
+#### Cache Pipeline:
+1. **Layer 1: Exact Match (Fast Path)**
+   - The user's query is normalized (lowercased, punctuation stripped) and combined with the target DB connection.
+   - An exact SHA-256 hash is computed. If it hits the DB, the result is yielded in `O(1)` time without hitting the LLM.
+2. **Layer 2: Semantic Similarity (TF-IDF)**
+   - If no exact hit occurs, the database fetches all cached normalized queries for the user's DB.
+   - A `TfidfVectorizer` (Term Frequency - Inverse Document Frequency) maps sentences into numeric vectors in memory. 
+   - **Cosine Similarity** determines proximity between the new query and cached ones. If similarity surpasses a defined boundary (`0.75`), the service defensively re-uses the closest result.
+3. **Storage, TTL, & LRU Handling**
+   - Results are upserted asynchronously. The database maintains `hit_count`, checking expiration metrics continuously to prune old schemas, bounding max table size to `500` and defaulting back to a fresh LangChain execution when required.
 
 ## How to Run It
 
