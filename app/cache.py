@@ -234,7 +234,7 @@ class SemanticCache:
                         "  last_hit_at = now(), "
                         "  hit_count = 0"
                     ),
-                    {"q": query, "nq": normalized, "h": query_hash, "dh": db_url_hash, "r": json.dumps(result)},
+                    {"q": query, "nq": normalized, "h": query_hash, "dh": db_url_hash, "r": json.dumps(result, default=str)},
                 )
                 conn.commit()
 
